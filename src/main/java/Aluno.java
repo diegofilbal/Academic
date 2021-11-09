@@ -10,8 +10,9 @@ public class Aluno {
     @SequenceGenerator(name = "aluno_seq", schema = "graduacao", sequenceName = "pes_seq", allocationSize = 1)
     private int id;
 
-
-    private int idPessoa;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_pessoa")
+    private Pessoa pessoa;
 
     @Basic
     @Column(name = "matricula")
@@ -24,9 +25,9 @@ public class Aluno {
     public Aluno() {
     }
 
-    public Aluno(int id, int idPessoa, String matricula, String anoEntrada) {
+    public Aluno(int id, Pessoa p, String matricula, String anoEntrada) {
         this.id = id;
-        this.idPessoa = idPessoa;
+        this.pessoa = p;
         this.matricula = matricula;
         this.anoEntrada = anoEntrada;
     }
@@ -39,12 +40,12 @@ public class Aluno {
         this.id = id;
     }
 
-    public int getIdPessoa() {
-        return idPessoa;
+    public Pessoa getPessoa() {
+        return pessoa;
     }
 
-    public void setIdPessoa(int idPessoa) {
-        this.idPessoa = idPessoa;
+    public void setPessoa(Pessoa pessoa) {
+        this.pessoa = pessoa;
     }
 
     public String getMatricula() {

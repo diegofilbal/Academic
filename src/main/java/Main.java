@@ -149,7 +149,7 @@ public class Main {
                                     // Verifica se existe algum aluno associado a essa pessoa
                                     flag = false;
                                     for (Aluno a : alunos) {
-                                        if(auxP.getId() == a.getIdPessoa()){
+                                        if(auxP.getId() == a.getPessoa().getId()){
                                             flag = true;
                                             break;
                                         }
@@ -215,7 +215,7 @@ public class Main {
 
                         switch (op2) {
                             case 1: // Inserir aluno
-                                System.out.print("Digite o ID da pessoa do aluno: ");
+                                System.out.print("Digite o ID da pessoa associada ao aluno: ");
                                 idP = scan.nextInt();
 
                                 // Verifica a existência da pessoa
@@ -247,7 +247,7 @@ public class Main {
                                     System.out.println();
 
                                     if (auxA == null) {
-                                        Aluno novoA = new Aluno(idA, idP, matricula, anoEntrada);
+                                        Aluno novoA = new Aluno(idA, auxP, matricula, anoEntrada);
                                         alunos.add(novoA);
                                         System.out.println("Inserção realizada com sucesso!");
 
@@ -275,7 +275,7 @@ public class Main {
 
                                 if (auxA != null) {
                                     System.out.println("\nQue campo deseja alterar?");
-                                    System.out.println("1 - ID da Pessoa: " + auxA.getId());
+                                    System.out.println("1 - ID da Pessoa: " + auxA.getPessoa().getId());
                                     System.out.println("2 - Matrícula: " + auxA.getMatricula());
                                     System.out.println("3 - Ano de entrada: " + auxA.getAnoEntrada());
                                     System.out.println("4 - Cancelar");
@@ -291,15 +291,15 @@ public class Main {
                                             idP = scan.nextInt();
 
                                             // Verifica se o ID é valido
-                                            flag = false;
+                                            auxP = null;
                                             for (Pessoa p : pessoas) {
                                                 if (idP == p.getId()) {
-                                                    flag = true;
+                                                    auxP = p;
                                                     break;
                                                 }
                                             }
-                                            if (flag) {
-                                                auxA.setIdPessoa(idP);
+                                            if (auxP != null) {
+                                                auxA.setPessoa(auxP);
                                                 System.out.println("\nID de Pessoa alterado com sucesso!");
                                             } else {
                                                 System.out.println("\nNão existe pessoa com o ID informado. Tente novamente!");
@@ -356,7 +356,7 @@ public class Main {
                                 }
                                 if (auxA != null) {
                                     System.out.println("\nDados do cadastro:");
-                                    System.out.println("ID de Pessoa: " + auxA.getIdPessoa());
+                                    System.out.println("ID de Pessoa: " + auxA.getPessoa().getId());
                                     System.out.println("Matrícula: " + auxA.getMatricula());
                                     System.out.println("Ano de entrada: " + auxA.getAnoEntrada());
                                     System.out.println("-----------------------------------");
@@ -382,7 +382,7 @@ public class Main {
                                     for (Aluno a : alunos) {
                                         System.out.println("--------------------------");
                                         System.out.println("ID Aluno: " + a.getId());
-                                        System.out.println("ID Pessoa: " + a.getIdPessoa());
+                                        System.out.println("ID Pessoa: " + a.getPessoa().getId());
                                         System.out.println("Matrícula: " + a.getMatricula());
                                         System.out.println("Ano de Entrada: " + a.getAnoEntrada());
                                     }
