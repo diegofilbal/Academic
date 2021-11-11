@@ -1,8 +1,10 @@
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+
+import javax.lang.model.element.Element;
+import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -51,40 +53,48 @@ public class Main {
 
                         switch (op2) {
                             case 1: // Inserir pessoa
-                                System.out.print("Digite o ID (tmp): ");
-                                idP = scan.nextInt();
-                                System.out.print("Digite o nome: ");
-                                scan.nextLine();
-                                nome = scan.nextLine();
                                 System.out.print("Digite o CPF: ");
+                                scan.nextLine();
                                 cpf = scan.nextLine();
 
+                                List listaPessoas;
+
                                 // Verifica a existência da pessoa
-                                auxP = null;
-                                for (Pessoa p : pessoas) {
-                                    if (idP == p.getId() || cpf.equals(p.getCpf())) {
-                                        auxP = p;
-                                        break;
+                                try {
+                                    transaction.begin();
+                                    StringBuilder queryBuilder = new StringBuilder();
+                                    queryBuilder.append("SELECT * FROM comum.pessoa ")
+                                                .append("WHERE cpf = '").append(cpf).append("'");
+
+                                    Query query = entityManager.createNativeQuery(queryBuilder.toString(), Pessoa.class);
+                                    listaPessoas = query.getResultList();
+                                    transaction.commit();
+                                }finally {
+                                    if (transaction.isActive()){
+                                        transaction.rollback();
                                     }
                                 }
 
-                                if (auxP == null) {
-                                    Pessoa novaP = new Pessoa(idP, nome, cpf);
+                                if(listaPessoas.isEmpty()){
+                                    System.out.print("Digite o nome: ");
+                                    nome = scan.nextLine();
+
+                                    Pessoa novaP = new Pessoa(nome, cpf);
                                     try {
                                         transaction.begin();
-                                        entityManager.persist(novaP);
+                                        Pessoa pessoa = new Pessoa();
+                                        pessoa.setNome(novaP.getNome());
+                                        pessoa.setCpf(novaP.getCpf());
+                                        entityManager.persist(pessoa);
                                         transaction.commit();
                                     }finally {
                                         if (transaction.isActive()){
                                             transaction.rollback();
                                         }
-                                        entityManager.close();
-                                        entityManagerFactory.close();
                                     }
-                                    pessoas.add(novaP);
                                     System.out.println("Inserção realizada com sucesso!");
                                 } else {
-                                    System.out.println("\nNão foi possível inserir essa pessoa. Este ID(tmp)/CPF já foi cadastrado!");
+                                    System.out.println("\nNão foi possível inserir essa pessoa. Este CPF já foi cadastrado!");
                                 }
                                 break;
 
@@ -426,6 +436,9 @@ public class Main {
                     break;
             }
         }while (op1 != 3);
+
+        entityManager.close();
+        entityManagerFactory.close();
 
     }
 }

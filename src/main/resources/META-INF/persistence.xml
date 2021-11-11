@@ -9,8 +9,8 @@
         <properties>
             <property name="hibernate.connection.url" value="jdbc:postgresql://localhost:5432/academico"/>
             <property name="hibernate.connection.driver_class" value="org.postgresql.Driver"/>
-            <property name="hibernate.connection.username" value="<seu_login>"/>
-            <property name="hibernate.connection.password" value="<sua_senha>"/>
+            <property name="hibernate.connection.username" value="postgres"/>
+            <property name="hibernate.connection.password" value="postgres"/>
             <property name="hibernate.show_sql" value="true"/>
         </properties>
     </persistence-unit>

@@ -1,7 +1,7 @@
 import javax.persistence.*;
 
 @Entity
-@Table(name = "aluno")
+@Table( schema = "graduacao", name = "aluno")
 public class Aluno {
 
     @Id

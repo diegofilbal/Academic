@@ -2,7 +2,7 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "pessoa")
+@Table(schema = "comum", name = "pessoa")
 public class Pessoa {
 
     @Id
@@ -25,8 +25,7 @@ public class Pessoa {
     public Pessoa() {
     }
 
-    public Pessoa(int id, String nome, String cpf) {
-        this.id = id;
+    public Pessoa(String nome, String cpf) {
         this.nome = nome;
         this.cpf = cpf;
     }
