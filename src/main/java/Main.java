@@ -1,8 +1,16 @@
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
+import javax.persistence.Persistence;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
+
+        EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("default");
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        EntityTransaction transaction = entityManager.getTransaction();
 
         // Lista de pessoas e alunos
         ArrayList <Pessoa> pessoas = new ArrayList<>();
@@ -62,6 +70,17 @@ public class Main {
 
                                 if (auxP == null) {
                                     Pessoa novaP = new Pessoa(idP, nome, cpf);
+                                    try {
+                                        transaction.begin();
+                                        entityManager.persist(novaP);
+                                        transaction.commit();
+                                    }finally {
+                                        if (transaction.isActive()){
+                                            transaction.rollback();
+                                        }
+                                        entityManager.close();
+                                        entityManagerFactory.close();
+                                    }
                                     pessoas.add(novaP);
                                     System.out.println("Inserção realizada com sucesso!");
                                 } else {
