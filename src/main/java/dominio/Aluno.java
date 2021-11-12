@@ -1,3 +1,5 @@
+package dominio;
+
 import javax.persistence.*;
 
 @Entity

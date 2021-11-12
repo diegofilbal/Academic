@@ -1,18 +1,23 @@
-import javax.persistence.*;
+package controle;
+
+import dominio.Aluno;
+import dominio.Pessoa;
+import servico.AlunoServico;
+import servico.PessoaServico;
+
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
 
-        EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("default");
-        EntityManager entityManager = entityManagerFactory.createEntityManager();
-        EntityTransaction transaction = entityManager.getTransaction();
-
         // Lista de pessoas e alunos
         ArrayList <Pessoa> pessoas = new ArrayList<>();
         ArrayList <Aluno> alunos = new ArrayList<>();
+
+        // Objetos de serviço
+        PessoaServico pessoaServico = new PessoaServico();
+        AlunoServico alunoServico = new AlunoServico();
 
         Scanner scan = new Scanner(System.in);
         int op1, op2, op3;
@@ -28,8 +33,9 @@ public class Main {
             op1 = scan.nextInt();
 
             String nome, cpf, matricula, anoEntrada;
-            List listaPessoas, listaAlunos;
-            Pessoa auxP;
+            ArrayList<Pessoa> listaPessoas;
+            ArrayList<Aluno> listaAlunos;
+            Pessoa auxP, pessoa;
             Aluno auxA;
             int idP, idA;
             boolean flag;
@@ -46,6 +52,7 @@ public class Main {
                         System.out.println("----------------------------");
                         System.out.print("Escolha uma opção: ");
                         op2 = scan.nextInt();
+                        scan.nextLine();
                         System.out.println();
 
                         switch (op2) {
@@ -54,61 +61,35 @@ public class Main {
                                 scan.nextLine();
                                 cpf = scan.nextLine();
 
-                                // Verifica a existência da pessoa
-                                try {
-                                    transaction.begin();
-                                    StringBuilder queryBuilder = new StringBuilder();
-                                    queryBuilder.append("SELECT * FROM comum.pessoa ")
-                                                .append("WHERE cpf = '").append(cpf).append("'");
-
-                                    Query query = entityManager.createNativeQuery(queryBuilder.toString(), Pessoa.class);
-                                    listaPessoas = query.getResultList();
-                                    transaction.commit();
-                                }finally {
-                                    if (transaction.isActive()){
-                                        transaction.rollback();
-                                    }
-
-                                }
-
-                                if(listaPessoas.isEmpty()){
+                                // Verifica a existência da pessoa antes de continuar
+                                if(!pessoaServico.existePessoa(cpf)){
                                     System.out.print("Digite o nome: ");
                                     nome = scan.nextLine();
 
                                     Pessoa novaP = new Pessoa(nome, cpf);
-                                    try {
-                                        transaction.begin();
-                                        entityManager.persist(novaP);
-                                        transaction.commit();
-                                    }finally {
-                                        if (transaction.isActive()){
-                                            transaction.rollback();
-
-                                        }
+                                    if(pessoaServico.inserir(novaP)){
+                                        System.out.println("\nInserção realizada com sucesso!");
+                                    }else{
+                                        System.out.println("\nErro inesperado ao inserir pessoa!");
                                     }
-                                    System.out.println("\nInserção realizada com sucesso!");
-                                } else {
+
+                                }else{
                                     System.out.println("\nNão foi possível inserir essa pessoa. Este CPF já foi cadastrado!");
                                 }
                                 break;
 
                             case 2: // Alterar pessoa
-                                System.out.print("Digite o ID da pessoa que deseja alterar: ");
-                                idP = scan.nextInt();
+                                System.out.print("Digite o CPF da pessoa que deseja alterar: ");
+                                //scan.nextLine();
+                                cpf = scan.nextLine();
 
-                                // Verifica a existência da pessoa
-                                auxP = null;
-                                for (Pessoa p : pessoas) {
-                                    if (idP == p.getId()) {
-                                        auxP = p;
-                                        break;
-                                    }
-                                }
+                                pessoa = pessoaServico.buscaPorCPF(cpf);
 
-                                if (auxP != null) {
+                                // Verifica a existência da pessoa antes de continuar
+                                if (pessoa != null) {
                                     System.out.println("\nQue campo deseja alterar?");
-                                    System.out.println("1 - Nome: " + auxP.getNome());
-                                    System.out.println("2 - CPF: " + auxP.getCpf());
+                                    System.out.println("1 - Nome: " + pessoa.getNome());
+                                    System.out.println("2 - CPF: " + pessoa.getCPF());
                                     System.out.println("3 - Cancelar");
                                     System.out.println("-----------------------------------");
                                     System.out.print("Escolha uma opção: ");
@@ -120,27 +101,31 @@ public class Main {
                                         case 1: // Nome
                                             System.out.print("Digite o novo nome: ");
                                             nome = scan.nextLine();
-                                            auxP.setNome(nome);
-                                            System.out.println("Nome alterado com sucesso!");
+                                            pessoa.setNome(nome);
+
+                                            if(pessoaServico.alteraPessoa(pessoa)){
+                                                System.out.println("\nNome alterado com sucesso!");
+                                            }else{
+                                                System.out.println("\nErro inesperado ao alterar CPF!");
+                                            }
                                             break;
 
                                         case 2: // CPF
                                             System.out.print("Digite o novo CPF: ");
                                             cpf = scan.nextLine();
 
-                                            // Verifica se CPF não está cadastrado
-                                            flag = false;
-                                            for (Pessoa p : pessoas) {
-                                                if (cpf.equals(p.getCpf())) {
-                                                    flag = true;
-                                                    break;
+                                            // Verifica se CPF não está cadastrado antes de continuar
+                                            if (!pessoaServico.existePessoa(cpf)) {
+                                                pessoa.setCPF(cpf);
+
+                                                if(pessoaServico.alteraPessoa(pessoa)) {
+                                                    System.out.println("\nCPF alterado com sucesso!");
+                                                }else{
+                                                    System.out.println("\nErro inesperado ao alterar nome!");
                                                 }
-                                            }
-                                            if (!flag) {
-                                                auxP.setCpf(cpf);
-                                                System.out.println("CPF alterado com sucesso!");
-                                            } else {
-                                                System.out.println("Este CPF já está cadastrado. Tente novamente!");
+
+                                            }else{
+                                                System.out.println("\nEste CPF já está cadastrado. Tente novamente!");
                                             }
                                             break;
 
@@ -157,80 +142,49 @@ public class Main {
 
                             case 3: // Remover pessoa
                                 System.out.print("Digite o CPF da pessoa que deseja remover: ");
-                                scan.nextLine();
                                 cpf = scan.nextLine();
                                 System.out.println(cpf);
 
-                                // Verifica a existência da pessoa
-                                // List listaPessoas;
-                                try {
-                                    transaction.begin();
-                                    StringBuilder queryBuilder = new StringBuilder();
-                                    queryBuilder.append("SELECT * FROM comum.pessoa ")
-                                            .append("WHERE cpf = '").append(cpf).append("'");
-
-                                    Query query = entityManager.createNativeQuery(queryBuilder.toString(), Pessoa.class);
-                                    listaPessoas = query.getResultList();
-                                    transaction.commit();
-                                }finally {
-                                    if (transaction.isActive()){
-                                        transaction.rollback();
-                                    }
-                                }
-
-                                if(!listaPessoas.isEmpty()){
+                                // Verifica a existência da pessoa antes de continuar
+                                pessoa = pessoaServico.buscaPorCPF(cpf);
+                                if(pessoa != null){
 
                                     /*
                                      * Fazer verificação dos alunos associados
                                      */
 
                                     System.out.println("\nDados do cadastro:");
-                                    System.out.println("ID: " + ((Pessoa) listaPessoas.get(0)).getId());
-                                    System.out.println("Nome: " + ((Pessoa) listaPessoas.get(0)).getNome());
-                                    System.out.println("CPF: " + ((Pessoa) listaPessoas.get(0)).getCpf());
+                                    System.out.println("ID: " + pessoa.getId());
+                                    System.out.println("Nome: " + pessoa.getNome());
+                                    System.out.println("CPF: " + pessoa.getCPF());
                                     System.out.println("-----------------------------------");
                                     System.out.print("Deseja mesmo remover essa pessoa (1 - Sim, 2 - Não)? ");
                                     op3 = scan.nextInt();
 
                                     if(op3 == 1){
-                                        try {
-                                            transaction.begin();
-                                            entityManager.remove(listaPessoas.get(0));
-                                            transaction.commit();
+                                        if(pessoaServico.remover(pessoa)){
                                             System.out.println("\nRemoção realizada com sucesso!");
-                                        }finally {
-                                            if (transaction.isActive()){
-                                                transaction.rollback();
-                                            }
+                                        }else{
+                                            System.out.println("\nErro inesperado ao remover pessoa!");
                                         }
+
                                     }else{
                                         System.out.println("\nOperação cancelada!");
                                     }
+
                                 }else{
                                     System.out.println("\nNão existe pessoa com o CPF informado. Tente novamente!");
                                 }
                                 break;
 
                             case 4: // Listar pessoas
-                                try {
-                                    transaction.begin();
-                                    StringBuilder queryBuilder = new StringBuilder();
-                                    queryBuilder.append("SELECT * FROM comum.pessoa ");
-                                    Query query = entityManager.createNativeQuery(queryBuilder.toString(), Pessoa.class);
-                                    listaPessoas = query.getResultList();
-                                    transaction.commit();
-                                }finally {
-                                    if (transaction.isActive()){
-                                        transaction.rollback();
-                                    }
-                                }
-
+                                listaPessoas = pessoaServico.getPessoas();
                                 if(!listaPessoas.isEmpty()){
-                                    for (Object p : listaPessoas) {
+                                    for (Pessoa p : listaPessoas) {
                                         System.out.println("--------------------------");
-                                        System.out.println("ID: " + ((Pessoa) p).getId());
-                                        System.out.println("Nome: " + ((Pessoa) p).getNome());
-                                        System.out.println("CPF: " + ((Pessoa) p).getCpf());
+                                        System.out.println("ID: " + p.getId());
+                                        System.out.println("Nome: " + p.getNome());
+                                        System.out.println("CPF: " + p.getCPF());
                                     }
                                     System.out.println("--------------------------");
                                 }else{
@@ -455,8 +409,7 @@ public class Main {
             }
         }while (op1 != 3);
 
-        entityManager.close();
-        entityManagerFactory.close();
+        pessoaServico.fechaEntidades();
 
     }
 }
