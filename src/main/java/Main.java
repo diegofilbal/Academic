@@ -1,7 +1,3 @@
-import org.hibernate.Criteria;
-import org.hibernate.Session;
-
-import javax.lang.model.element.Element;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +28,7 @@ public class Main {
             op1 = scan.nextInt();
 
             String nome, cpf, matricula, anoEntrada;
+            List listaPessoas, listaAlunos;
             Pessoa auxP;
             Aluno auxA;
             int idP, idA;
@@ -57,8 +54,6 @@ public class Main {
                                 scan.nextLine();
                                 cpf = scan.nextLine();
 
-                                List listaPessoas;
-
                                 // Verifica a existência da pessoa
                                 try {
                                     transaction.begin();
@@ -73,6 +68,7 @@ public class Main {
                                     if (transaction.isActive()){
                                         transaction.rollback();
                                     }
+
                                 }
 
                                 if(listaPessoas.isEmpty()){
@@ -82,17 +78,15 @@ public class Main {
                                     Pessoa novaP = new Pessoa(nome, cpf);
                                     try {
                                         transaction.begin();
-                                        Pessoa pessoa = new Pessoa();
-                                        pessoa.setNome(novaP.getNome());
-                                        pessoa.setCpf(novaP.getCpf());
-                                        entityManager.persist(pessoa);
+                                        entityManager.persist(novaP);
                                         transaction.commit();
                                     }finally {
                                         if (transaction.isActive()){
                                             transaction.rollback();
+
                                         }
                                     }
-                                    System.out.println("Inserção realizada com sucesso!");
+                                    System.out.println("\nInserção realizada com sucesso!");
                                 } else {
                                     System.out.println("\nNão foi possível inserir essa pessoa. Este CPF já foi cadastrado!");
                                 }
@@ -162,61 +156,85 @@ public class Main {
                                 break;
 
                             case 3: // Remover pessoa
-                                System.out.print("Digite o ID da pessoa que deseja remover: ");
-                                idP = scan.nextInt();
+                                System.out.print("Digite o CPF da pessoa que deseja remover: ");
+                                scan.nextLine();
+                                cpf = scan.nextLine();
+                                System.out.println(cpf);
 
                                 // Verifica a existência da pessoa
-                                auxP = null;
-                                for (Pessoa p : pessoas) {
-                                    if (idP == p.getId()) {
-                                        auxP = p;
-                                        break;
+                                // List listaPessoas;
+                                try {
+                                    transaction.begin();
+                                    StringBuilder queryBuilder = new StringBuilder();
+                                    queryBuilder.append("SELECT * FROM comum.pessoa ")
+                                            .append("WHERE cpf = '").append(cpf).append("'");
+
+                                    Query query = entityManager.createNativeQuery(queryBuilder.toString(), Pessoa.class);
+                                    listaPessoas = query.getResultList();
+                                    transaction.commit();
+                                }finally {
+                                    if (transaction.isActive()){
+                                        transaction.rollback();
                                     }
                                 }
 
-                                if (auxP != null) {
-                                    // Verifica se existe algum aluno associado a essa pessoa
-                                    flag = false;
-                                    for (Aluno a : alunos) {
-                                        if(auxP.getId() == a.getPessoa().getId()){
-                                            flag = true;
-                                            break;
-                                        }
-                                    }
+                                if(!listaPessoas.isEmpty()){
 
-                                    if(!flag) {
-                                        System.out.println("\nDados do cadastro:");
-                                        System.out.println("Nome: " + auxP.getNome());
-                                        System.out.println("CPF: " + auxP.getCpf());
-                                        System.out.println("-----------------------------------");
-                                        System.out.print("Deseja mesmo remover essa pessoa (1 - Sim, 2 - Não)? ");
-                                        op3 = scan.nextInt();
+                                    /*
+                                     * Fazer verificação dos alunos associados
+                                     */
 
-                                        if (op3 == 1) {
-                                            pessoas.remove(auxP);
-                                            System.out.println("\nPessoa removida com sucesso!");
-                                        } else {
-                                            System.out.println("\nOperação cancelada!");
+                                    System.out.println("\nDados do cadastro:");
+                                    System.out.println("ID: " + ((Pessoa) listaPessoas.get(0)).getId());
+                                    System.out.println("Nome: " + ((Pessoa) listaPessoas.get(0)).getNome());
+                                    System.out.println("CPF: " + ((Pessoa) listaPessoas.get(0)).getCpf());
+                                    System.out.println("-----------------------------------");
+                                    System.out.print("Deseja mesmo remover essa pessoa (1 - Sim, 2 - Não)? ");
+                                    op3 = scan.nextInt();
+
+                                    if(op3 == 1){
+                                        try {
+                                            transaction.begin();
+                                            entityManager.remove(listaPessoas.get(0));
+                                            transaction.commit();
+                                            System.out.println("\nRemoção realizada com sucesso!");
+                                        }finally {
+                                            if (transaction.isActive()){
+                                                transaction.rollback();
+                                            }
                                         }
                                     }else{
-                                        System.out.println("\nNão é possível remover essa pessoa pois existe(m) aluno(s) associado(s) a ela. Tente novamente!");
+                                        System.out.println("\nOperação cancelada!");
                                     }
                                 }else{
-                                    System.out.println("\nNão existe pessoa com o ID informado. Tente novamente!");
+                                    System.out.println("\nNão existe pessoa com o CPF informado. Tente novamente!");
                                 }
                                 break;
 
                             case 4: // Listar pessoas
-                                if (pessoas.isEmpty()) {
-                                    System.out.println("Não existem pessoas cadastradas!");
-                                } else {
-                                    for (Pessoa p : pessoas) {
+                                try {
+                                    transaction.begin();
+                                    StringBuilder queryBuilder = new StringBuilder();
+                                    queryBuilder.append("SELECT * FROM comum.pessoa ");
+                                    Query query = entityManager.createNativeQuery(queryBuilder.toString(), Pessoa.class);
+                                    listaPessoas = query.getResultList();
+                                    transaction.commit();
+                                }finally {
+                                    if (transaction.isActive()){
+                                        transaction.rollback();
+                                    }
+                                }
+
+                                if(!listaPessoas.isEmpty()){
+                                    for (Object p : listaPessoas) {
                                         System.out.println("--------------------------");
-                                        System.out.println("ID: " + p.getId());
-                                        System.out.println("Nome: " + p.getNome());
-                                        System.out.println("CPF: " + p.getCpf());
+                                        System.out.println("ID: " + ((Pessoa) p).getId());
+                                        System.out.println("Nome: " + ((Pessoa) p).getNome());
+                                        System.out.println("CPF: " + ((Pessoa) p).getCpf());
                                     }
                                     System.out.println("--------------------------");
+                                }else{
+                                    System.out.println("Não existem pessoas cadastradas!");
                                 }
                                 break;
 
