@@ -57,6 +57,22 @@ public class AlunoServico {
         return sucesso;
     }
 
+    public boolean altera(Aluno aluno){
+        boolean sucesso;
+        try{
+            transaction.begin();
+            entityManager.merge(aluno);
+            transaction.commit();
+            sucesso = true;
+        }finally{
+            if (transaction.isActive()){
+                transaction.rollback();
+                sucesso = false;
+            }
+        }
+        return sucesso;
+    }
+
     public ArrayList<Aluno> getAlunos(){
         ArrayList<Aluno> lista;
         try {

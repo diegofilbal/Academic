@@ -35,10 +35,9 @@ public class Main {
             String nome, cpf, matricula;
             ArrayList<Pessoa> listaPessoas;
             ArrayList<Aluno> listaAlunos;
-            Pessoa auxP, pessoa;
-            Aluno auxA;
-            int idP, idA, anoEntrada;
-            boolean flag;
+            Pessoa pessoa;
+            Aluno auxA, aluno;
+            int idA, anoEntrada;
 
             switch (op1){
                 case 1:
@@ -80,12 +79,10 @@ public class Main {
 
                             case 2: // Alterar pessoa
                                 System.out.print("Digite o CPF da pessoa que deseja alterar: ");
-                                //scan.nextLine();
                                 cpf = scan.nextLine();
 
-                                pessoa = pessoaServico.buscaPorCPF(cpf);
-
                                 // Verifica a existência da pessoa antes de continuar
+                                pessoa = pessoaServico.buscaPorCPF(cpf);
                                 if (pessoa != null) {
                                     System.out.println("\nQue campo deseja alterar?");
                                     System.out.println("1 - Nome: " + pessoa.getNome());
@@ -103,7 +100,7 @@ public class Main {
                                             nome = scan.nextLine();
                                             pessoa.setNome(nome);
 
-                                            if(pessoaServico.alteraPessoa(pessoa)){
+                                            if(pessoaServico.altera(pessoa)){
                                                 System.out.println("\nNome alterado com sucesso!");
                                             }else{
                                                 System.out.println("\nErro inesperado ao alterar CPF!");
@@ -118,7 +115,7 @@ public class Main {
                                             if (!pessoaServico.existePessoa(cpf)) {
                                                 pessoa.setCPF(cpf);
 
-                                                if(pessoaServico.alteraPessoa(pessoa)) {
+                                                if(pessoaServico.altera(pessoa)) {
                                                     System.out.println("\nCPF alterado com sucesso!");
                                                 }else{
                                                     System.out.println("\nErro inesperado ao alterar nome!");
@@ -136,7 +133,7 @@ public class Main {
                                         default: break;
                                     }
                                 }else{
-                                    System.out.println("\nNão existe pessoa com o ID informado. Tente novamente!");
+                                    System.out.println("\nNão existe pessoa com o CPF informado. Tente novamente!");
                                 }
                                 break;
 
@@ -152,7 +149,6 @@ public class Main {
                                     // TODO Fazer verificação dos alunos associados
 
                                     System.out.println("\nDados do cadastro:");
-                                    System.out.println("ID: " + pessoa.getId());
                                     System.out.println("Nome: " + pessoa.getNome());
                                     System.out.println("CPF: " + pessoa.getCPF());
                                     System.out.println("-----------------------------------");
@@ -180,7 +176,6 @@ public class Main {
                                 if(!listaPessoas.isEmpty()){
                                     for (Pessoa p : listaPessoas) {
                                         System.out.println("--------------------------");
-                                        System.out.println("ID: " + p.getId());
                                         System.out.println("Nome: " + p.getNome());
                                         System.out.println("CPF: " + p.getCPF());
                                     }
@@ -246,23 +241,16 @@ public class Main {
                                 break;
 
                             case 2: // Alterar aluno
-                                System.out.print("Digite o ID do aluno que deseja alterar: ");
-                                idA = scan.nextInt();
+                                System.out.print("Digite a matrícula do aluno que deseja alterar: ");
+                                matricula = scan.nextLine();
 
-                                // Verifica a existência do aluno
-                                auxA = null;
-                                for (Aluno a : alunos) {
-                                    if (idA == a.getId()) {
-                                        auxA = a;
-                                        break;
-                                    }
-                                }
-
-                                if (auxA != null) {
+                                // Verifica a existência do aluno antes de continuar
+                                aluno = alunoServico.buscaPorMatricula(matricula);
+                                if(aluno != null){
                                     System.out.println("\nQue campo deseja alterar?");
-                                    System.out.println("1 - ID da Pessoa: " + auxA.getPessoa().getId());
-                                    System.out.println("2 - Matrícula: " + auxA.getMatricula());
-                                    System.out.println("3 - Ano de entrada: " + auxA.getAnoEntrada());
+                                    System.out.println("1 - Pessoa vinculada (CPF): " + aluno.getPessoa().getCPF());
+                                    System.out.println("2 - Matrícula: " + aluno.getMatricula());
+                                    System.out.println("3 - Ano de entrada: " + aluno.getAnoEntrada());
                                     System.out.println("4 - Cancelar");
                                     System.out.println("-----------------------------------");
                                     System.out.print("Escolha uma opção: ");
@@ -271,23 +259,23 @@ public class Main {
                                     System.out.println();
 
                                     switch (op3) {
-                                        case 1: // ID da Pessoa
-                                            System.out.print("Digite o novo ID de Pessoa: ");
-                                            idP = scan.nextInt();
+                                        case 1: // CPF da Pessoa
+                                            System.out.print("Digite o CPF da pessoa para qual deseja alterar o vínculo: ");
+                                            cpf = scan.nextLine();
 
-                                            // Verifica se o ID é valido
-                                            auxP = null;
-                                            for (Pessoa p : pessoas) {
-                                                if (idP == p.getId()) {
-                                                    auxP = p;
-                                                    break;
+                                            // Verifica se o CPF é valido
+                                            pessoa = pessoaServico.buscaPorCPF(cpf);
+                                            if(pessoa != null){
+                                                aluno.setPessoa(pessoa);
+
+                                                if(alunoServico.altera(aluno)){
+                                                    System.out.println("\nPessoa vinculada alterada com sucesso!");
+                                                }else{
+                                                    System.out.println("\nErro inesperado ao alterar a pessoa vinculada a este aluno!");
                                                 }
-                                            }
-                                            if (auxP != null) {
-                                                auxA.setPessoa(auxP);
-                                                System.out.println("\nID de Pessoa alterado com sucesso!");
-                                            } else {
-                                                System.out.println("\nNão existe pessoa com o ID informado. Tente novamente!");
+
+                                            }else{
+                                                System.out.println("\nNão existe pessoa com o CPF informado. Tente novamente!");
                                             }
                                             break;
 
@@ -295,18 +283,17 @@ public class Main {
                                             System.out.print("Digite a nova matrícula: ");
                                             matricula = scan.nextLine();
 
-                                            // Verifica se a matrícula não está cadastrada
-                                            flag = false;
-                                            for (Aluno a : alunos) {
-                                                if (matricula.equals(a.getMatricula())) {
-                                                    flag = true;
-                                                    break;
+                                            // Verifica se a matrícula não está cadastrada antes de continuar
+                                            if(!alunoServico.existeAluno(matricula)){
+                                                aluno.setMatricula(matricula);
+
+                                                if(alunoServico.altera(aluno)) {
+                                                    System.out.println("\nMatrícula alterada com sucesso!");
+                                                }else{
+                                                    System.out.println("\nErro inesperado ao alterar matrícula");
                                                 }
-                                            }
-                                            if (!flag) {
-                                                auxA.setMatricula(matricula);
-                                                System.out.println("\nMatrícula alterada com sucesso!");
-                                            } else {
+
+                                            }else{
                                                 System.out.println("\nEsta matrícula já está cadastrada. Tente novamente!");
                                             }
                                             break;
@@ -314,8 +301,14 @@ public class Main {
                                         case 3: // Ano de entrada
                                             System.out.print("Digite o novo ano de entrada: ");
                                             anoEntrada = scan.nextInt();
-                                            auxA.setAnoEntrada(anoEntrada);
-                                            System.out.println("\nAno de entrada alterado com sucesso!");
+
+                                            aluno.setAnoEntrada(anoEntrada);
+
+                                            if(alunoServico.altera(aluno)){
+                                                System.out.println("\nAno de entrada alterado com sucesso!");
+                                            }else{
+                                                System.out.println("\nErro inesperado ao alterar o ano de entrada!");
+                                            }
                                             break;
 
                                         case 4: // Cancelar
@@ -323,7 +316,7 @@ public class Main {
                                             break;
                                     }
                                 }else{
-                                    System.out.println("\nNão existe aluno com o ID informado. Tente novamente!");
+                                    System.out.println("\nNão existe aluno com a matrícula informada. Tente novamente!");
                                 }
                                 break;
 
@@ -363,12 +356,11 @@ public class Main {
                             case 4: // Listar alunos
                                 listaAlunos = alunoServico.getAlunos();
                                 if(!listaAlunos.isEmpty()){
-                                    for (Aluno aluno : listaAlunos) {
+                                    for (Aluno a : listaAlunos) {
                                         System.out.println("--------------------------");
-                                        System.out.println("ID: " + aluno.getId());
-                                        System.out.println("ID Pessoa Associada: " + aluno.getPessoa().getId());
-                                        System.out.println("Matrícula: " + aluno.getMatricula());
-                                        System.out.println("Ano de Entrada: " + aluno.getAnoEntrada());
+                                        System.out.println("Pessoa vinculada (CPF): " + a.getPessoa().getCPF());
+                                        System.out.println("Matrícula: " + a.getMatricula());
+                                        System.out.println("Ano de Entrada: " + a.getAnoEntrada());
                                     }
                                     System.out.println("--------------------------");
                                 }else{
