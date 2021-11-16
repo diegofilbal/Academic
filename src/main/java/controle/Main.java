@@ -11,15 +11,24 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
 
-        // Lista de pessoas e alunos
-        ArrayList <Pessoa> pessoas = new ArrayList<>();
-        ArrayList <Aluno> alunos = new ArrayList<>();
+        // Objeto para leitura de valores pelo terminal
+        Scanner scan = new Scanner(System.in);
 
-        // Objetos de serviço
+        // Objetos de serviço para interação com o banco de dados
         PessoaServico pessoaServico = new PessoaServico();
         AlunoServico alunoServico = new AlunoServico();
 
-        Scanner scan = new Scanner(System.in);
+        // Listas para armazenamento dos dados do banco de dados
+        ArrayList<Pessoa> listaPessoas;
+        ArrayList<Aluno> listaAlunos;
+
+        // Objetos e variáveis genéricas para operações auxiliares
+        Pessoa pessoa;
+        Aluno aluno;
+        String nome, cpf, matricula;
+        int anoEntrada;
+
+        // Variáveis para armazenamento de opções do menu
         int op1, op2, op3;
 
         // Menus
@@ -31,13 +40,6 @@ public class Main {
             System.out.println("--------------------------");
             System.out.print("Escolha uma opção: ");
             op1 = scan.nextInt();
-
-            String nome, cpf, matricula;
-            ArrayList<Pessoa> listaPessoas;
-            ArrayList<Aluno> listaAlunos;
-            Pessoa pessoa;
-            Aluno auxA, aluno;
-            int idA, anoEntrada;
 
             switch (op1){
                 case 1:
@@ -321,35 +323,33 @@ public class Main {
                                 break;
 
                             case 3: // Remover aluno
-                                System.out.print("Digite o ID do aluno que deseja remover: ");
-                                idA = scan.nextInt();
+                                System.out.print("Digite a matrícula do aluno que deseja remover: ");
+                                matricula = scan.nextLine();
 
-                                // Verifica a existência do aluno
-                                auxA = null;
-                                for (Aluno a : alunos) {
-                                    if (idA == a.getId()) {
-                                        auxA = a;
-                                        break;
-                                    }
-                                }
-                                if (auxA != null) {
+                                // Verifica a existência do aluno antes de continuar
+                                aluno = alunoServico.buscaPorMatricula(matricula);
+                                if (aluno != null) {
                                     System.out.println("\nDados do cadastro:");
-                                    System.out.println("ID de Pessoa: " + auxA.getPessoa().getId());
-                                    System.out.println("Matrícula: " + auxA.getMatricula());
-                                    System.out.println("Ano de entrada: " + auxA.getAnoEntrada());
+                                    System.out.println("Pessoa vinculada (CPF): " + aluno.getPessoa().getCPF());
+                                    System.out.println("Matrícula: " + aluno.getMatricula());
+                                    System.out.println("Ano de entrada: " + aluno.getAnoEntrada());
                                     System.out.println("-----------------------------------");
                                     System.out.print("Deseja mesmo remover esse aluno (1 - Sim, 2 - Não)? ");
                                     op3 = scan.nextInt();
-                                    System.out.println();
 
-                                    if (op3 == 1) {
-                                        alunos.remove(auxA);
-                                        System.out.println("\nAluno removido com sucesso!");
-                                    } else {
+                                    if(op3 == 1){
+                                        if(alunoServico.remover(aluno)){
+                                            System.out.println("\nAluno removido com sucesso!");
+                                        }else{
+                                            System.out.println("\nErro inesperado ao remover aluno!");
+                                        }
+
+                                    }else{
                                         System.out.println("\nOperação cancelada!");
                                     }
+
                                 }else{
-                                    System.out.println("\nNão existe aluno com o ID informado. Tente novamente!");
+                                    System.out.println("\nNão existe aluno com a matrícula informada. Tente novamente!");
                                 }
                                 break;
 

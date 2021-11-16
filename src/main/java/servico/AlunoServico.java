@@ -73,6 +73,22 @@ public class AlunoServico {
         return sucesso;
     }
 
+    public boolean remover(Aluno aluno){
+        boolean sucesso;
+        try {
+            transaction.begin();
+            entityManager.remove(aluno);
+            transaction.commit();
+            sucesso = true;
+        }finally {
+            if (transaction.isActive()){
+                transaction.rollback();
+                sucesso = false;
+            }
+        }
+        return sucesso;
+    }
+
     public ArrayList<Aluno> getAlunos(){
         ArrayList<Aluno> lista;
         try {
