@@ -149,9 +149,7 @@ public class Main {
                                 pessoa = pessoaServico.buscaPorCPF(cpf);
                                 if(pessoa != null){
 
-                                    /*
-                                     * Fazer verificação dos alunos associados
-                                     */
+                                    // TODO Fazer verificação dos alunos associados
 
                                     System.out.println("\nDados do cadastro:");
                                     System.out.println("ID: " + pessoa.getId());
@@ -212,6 +210,7 @@ public class Main {
                         System.out.println("---------------------------");
                         System.out.print("Escolha uma opção: ");
                         op2 = scan.nextInt();
+                        scan.nextLine();
                         System.out.println();
 
                         switch (op2) {
@@ -377,17 +376,18 @@ public class Main {
                                 break;
 
                             case 4: // Listar alunos
-                                if (alunos.isEmpty()) {
-                                    System.out.println("Não existem alunos cadastrados!");
-                                } else {
-                                    for (Aluno a : alunos) {
+                                listaAlunos = alunoServico.getAlunos();
+                                if(!listaAlunos.isEmpty()){
+                                    for (Aluno aluno : listaAlunos) {
                                         System.out.println("--------------------------");
-                                        System.out.println("ID Aluno: " + a.getId());
-                                        System.out.println("ID Pessoa: " + a.getPessoa().getId());
-                                        System.out.println("Matrícula: " + a.getMatricula());
-                                        System.out.println("Ano de Entrada: " + a.getAnoEntrada());
+                                        System.out.println("ID: " + aluno.getId());
+                                        System.out.println("ID Pessoa Associada: " + aluno.getPessoa().getId());
+                                        System.out.println("Matrícula: " + aluno.getMatricula());
+                                        System.out.println("Ano de Entrada: " + aluno.getAnoEntrada());
                                     }
                                     System.out.println("--------------------------");
+                                }else{
+                                    System.out.println("Não existem alunos cadastrados!");
                                 }
                                 break;
 
@@ -410,6 +410,7 @@ public class Main {
         }while (op1 != 3);
 
         pessoaServico.fechaEntidades();
+        alunoServico.fechaEntidades();
 
     }
 }
