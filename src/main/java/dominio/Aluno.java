@@ -9,7 +9,7 @@ public class Aluno {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy= GenerationType.SEQUENCE, generator = "aluno_seq")
-    @SequenceGenerator(name = "aluno_seq", schema = "graduacao", sequenceName = "pes_seq", allocationSize = 1)
+    @SequenceGenerator(name = "aluno_seq", schema = "graduacao", sequenceName = "aluno_seq", allocationSize = 1)
     private int id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -22,14 +22,13 @@ public class Aluno {
 
     @Basic
     @Column(name = "ano_entrada")
-    private String anoEntrada;
+    private int anoEntrada;
 
     public Aluno() {
     }
 
-    public Aluno(int id, Pessoa p, String matricula, String anoEntrada) {
-        this.id = id;
-        this.pessoa = p;
+    public Aluno(Pessoa pessoa, String matricula, int anoEntrada) {
+        this.pessoa = pessoa;
         this.matricula = matricula;
         this.anoEntrada = anoEntrada;
     }
@@ -58,11 +57,11 @@ public class Aluno {
         this.matricula = matricula;
     }
 
-    public String getAnoEntrada() {
+    public int getAnoEntrada() {
         return anoEntrada;
     }
 
-    public void setAnoEntrada(String anoEntrada) {
+    public void setAnoEntrada(int anoEntrada) {
         this.anoEntrada = anoEntrada;
     }
 }

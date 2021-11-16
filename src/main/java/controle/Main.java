@@ -32,12 +32,12 @@ public class Main {
             System.out.print("Escolha uma opção: ");
             op1 = scan.nextInt();
 
-            String nome, cpf, matricula, anoEntrada;
+            String nome, cpf, matricula;
             ArrayList<Pessoa> listaPessoas;
             ArrayList<Aluno> listaAlunos;
             Pessoa auxP, pessoa;
             Aluno auxA;
-            int idP, idA;
+            int idP, idA, anoEntrada;
             boolean flag;
 
             switch (op1){
@@ -215,48 +215,33 @@ public class Main {
 
                         switch (op2) {
                             case 1: // Inserir aluno
-                                System.out.print("Digite o ID da pessoa associada ao aluno: ");
-                                idP = scan.nextInt();
+                                System.out.print("Digite o CPF da pessoa associada ao aluno: ");
+                                cpf = scan.nextLine();
 
-                                // Verifica a existência da pessoa
-                                auxP = null;
-                                for (Pessoa p : pessoas) {
-                                    if (idP == p.getId()) {
-                                        auxP = p;
-                                        break;
-                                    }
-                                }
-
-                                if (auxP != null) {
-                                    System.out.print("Digite o ID do aluno (tmp): ");
-                                    idA = scan.nextInt();
-                                    scan.nextLine();
+                                // Verifica a existência da pessoa antes de continuar
+                                pessoa = pessoaServico.buscaPorCPF(cpf);
+                                if (pessoa != null) {
                                     System.out.print("Digite a matrícula: ");
                                     matricula = scan.nextLine();
-                                    System.out.print("Digite o ano de entrada (DD-MM-AAAA): ");
-                                    anoEntrada = scan.nextLine();
 
-                                    // Verifica a existência do aluno
-                                    auxA = null;
-                                    for (Aluno a : alunos) {
-                                        if (idA == a.getId() || matricula.equals(a.getMatricula())) {
-                                            auxA = a;
-                                            break;
+                                    // Verifica a existência do aluno antes de continuar
+                                    if(!alunoServico.existeAluno(matricula)){
+                                        System.out.print("Digite o ano de entrada: ");
+                                        anoEntrada = scan.nextInt();
+
+                                        Aluno novoA = new Aluno(pessoa, matricula, anoEntrada);
+                                        if(alunoServico.inserir(novoA)) {
+                                            System.out.println("\nInserção realizada com sucesso!");
+                                        }else{
+                                            System.out.println("\nErro inesperado ao inserir aluno!");
                                         }
-                                    }
-                                    System.out.println();
 
-                                    if (auxA == null) {
-                                        Aluno novoA = new Aluno(idA, auxP, matricula, anoEntrada);
-                                        alunos.add(novoA);
-                                        System.out.println("Inserção realizada com sucesso!");
-
-                                    } else {
-                                        System.out.println("Não foi possível inserir esse aluno. Esta matrícula/ID(tmp) já foi cadastrada!");
+                                    }else{
+                                        System.out.println("\nNão foi possível inserir esse aluno. Esta matrícula já foi cadastrada!");
                                     }
 
                                 } else {
-                                    System.out.println("\nNão foi possível inserir esse aluno. O ID de pessoa informado não existe!");
+                                    System.out.println("\nNão foi possível inserir o aluno. Não existe pessoa com o CPF informado!");
                                 }
                                 break;
 
@@ -327,8 +312,8 @@ public class Main {
                                             break;
 
                                         case 3: // Ano de entrada
-                                            System.out.print("Digite o novo ano de entrada (DD-MM-AAAA): ");
-                                            anoEntrada = scan.nextLine();
+                                            System.out.print("Digite o novo ano de entrada: ");
+                                            anoEntrada = scan.nextInt();
                                             auxA.setAnoEntrada(anoEntrada);
                                             System.out.println("\nAno de entrada alterado com sucesso!");
                                             break;
