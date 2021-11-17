@@ -1,6 +1,7 @@
 package dominio;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -22,7 +23,7 @@ public class Pessoa {
     private String cpf;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "pessoa")
-    private List<Aluno> aluno;
+    private List<Aluno> alunos;
 
     public Pessoa() {
     }
@@ -30,6 +31,13 @@ public class Pessoa {
     public Pessoa(String nome, String cpf) {
         this.nome = nome;
         this.cpf = cpf;
+    }
+
+    @Override
+    public String toString() {
+        return "Nome: " + nome + "\n" +
+                "CPF: " + cpf + "\n" +
+                "-----------------------------";
     }
 
     public int getId() {
@@ -56,11 +64,11 @@ public class Pessoa {
         this.cpf = cpf;
     }
 
-    public List<Aluno> getAluno() {
-        return aluno;
+    public List<Aluno> getAlunos() {
+        return alunos;
     }
 
-    public void setAluno(List<Aluno> aluno) {
-        this.aluno = aluno;
+    public void setAlunos(List<Aluno> alunos) {
+        this.alunos = alunos;
     }
 }

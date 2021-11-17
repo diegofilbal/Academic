@@ -33,6 +33,14 @@ public class Aluno {
         this.anoEntrada = anoEntrada;
     }
 
+    @Override
+    public String toString() {
+        return "Pessoa vinculada (Nome, CPF): " + pessoa.getNome() + ", " + pessoa.getCPF() + "\n" +
+                "Matrícula: " + matricula + "\n" +
+                "Ano de entrada: " + anoEntrada + "\n" +
+                "---------------------------------------------";
+    }
+
     public int getId() {
         return id;
     }
