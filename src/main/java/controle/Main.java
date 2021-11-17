@@ -142,32 +142,34 @@ public class Main {
                             case 3: // Remover pessoa
                                 System.out.print("Digite o CPF da pessoa que deseja remover: ");
                                 cpf = scan.nextLine();
-                                System.out.println(cpf);
 
                                 // Verifica a existência da pessoa antes de continuar
                                 pessoa = pessoaServico.buscaPorCPF(cpf);
                                 if(pessoa != null){
 
-                                    // TODO Fazer verificação dos alunos associados
+                                    // Verifica se existe algum aluno associado a essa pessoa
+                                    if(pessoa.getAlunos().isEmpty()) {
+                                        System.out.println("\nDados do cadastro:");
+                                        System.out.println("Nome: " + pessoa.getNome());
+                                        System.out.println("CPF: " + pessoa.getCPF());
+                                        System.out.println("-----------------------------------");
+                                        System.out.print("Deseja mesmo remover essa pessoa (1 - Sim, 2 - Não)? ");
+                                        op3 = scan.nextInt();
 
-                                    System.out.println("\nDados do cadastro:");
-                                    System.out.println("Nome: " + pessoa.getNome());
-                                    System.out.println("CPF: " + pessoa.getCPF());
-                                    System.out.println("-----------------------------------");
-                                    System.out.print("Deseja mesmo remover essa pessoa (1 - Sim, 2 - Não)? ");
-                                    op3 = scan.nextInt();
+                                        if (op3 == 1) {
+                                            if (pessoaServico.remover(pessoa)) {
+                                                System.out.println("\nRemoção realizada com sucesso!");
+                                            } else {
+                                                System.out.println("\nErro inesperado ao remover pessoa!");
+                                            }
 
-                                    if(op3 == 1){
-                                        if(pessoaServico.remover(pessoa)){
-                                            System.out.println("\nRemoção realizada com sucesso!");
-                                        }else{
-                                            System.out.println("\nErro inesperado ao remover pessoa!");
+                                        } else {
+                                            System.out.println("\nOperação cancelada!");
                                         }
 
-                                    }else{
-                                        System.out.println("\nOperação cancelada!");
+                                    } else {
+                                        System.out.println("\nNão é possível remover essa pessoa pois existe(m) aluno(s) associado(s) a ela. Tente novamente!");
                                     }
-
                                 }else{
                                     System.out.println("\nNão existe pessoa com o CPF informado. Tente novamente!");
                                 }
@@ -176,12 +178,10 @@ public class Main {
                             case 4: // Listar pessoas
                                 listaPessoas = pessoaServico.getPessoas();
                                 if(!listaPessoas.isEmpty()){
-                                    for (Pessoa p : listaPessoas) {
-                                        System.out.println("--------------------------");
-                                        System.out.println("Nome: " + p.getNome());
-                                        System.out.println("CPF: " + p.getCPF());
+                                    System.out.println("-----------------------------");
+                                    for (Pessoa pessoaAux : listaPessoas) {
+                                        System.out.println(pessoaAux);
                                     }
-                                    System.out.println("--------------------------");
                                 }else{
                                     System.out.println("Não existem pessoas cadastradas!");
                                 }
@@ -330,10 +330,7 @@ public class Main {
                                 aluno = alunoServico.buscaPorMatricula(matricula);
                                 if (aluno != null) {
                                     System.out.println("\nDados do cadastro:");
-                                    System.out.println("Pessoa vinculada (CPF): " + aluno.getPessoa().getCPF());
-                                    System.out.println("Matrícula: " + aluno.getMatricula());
-                                    System.out.println("Ano de entrada: " + aluno.getAnoEntrada());
-                                    System.out.println("-----------------------------------");
+                                    System.out.println(aluno);
                                     System.out.print("Deseja mesmo remover esse aluno (1 - Sim, 2 - Não)? ");
                                     op3 = scan.nextInt();
 
@@ -356,13 +353,10 @@ public class Main {
                             case 4: // Listar alunos
                                 listaAlunos = alunoServico.getAlunos();
                                 if(!listaAlunos.isEmpty()){
-                                    for (Aluno a : listaAlunos) {
-                                        System.out.println("--------------------------");
-                                        System.out.println("Pessoa vinculada (CPF): " + a.getPessoa().getCPF());
-                                        System.out.println("Matrícula: " + a.getMatricula());
-                                        System.out.println("Ano de Entrada: " + a.getAnoEntrada());
+                                    System.out.println("---------------------------------------------");
+                                    for (Aluno alunoAux : listaAlunos) {
+                                        System.out.println(alunoAux);
                                     }
-                                    System.out.println("--------------------------");
                                 }else{
                                     System.out.println("Não existem alunos cadastrados!");
                                 }
