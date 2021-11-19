@@ -106,6 +106,28 @@ public class AlunoServico {
         return lista;
     }
 
+    public ArrayList<Aluno> getAlunosPorPessoa(Pessoa pessoa){
+        ArrayList<Aluno> lista;
+        try {
+            transaction.begin();
+            StringBuilder queryBuilder = new StringBuilder();
+            queryBuilder.append("SELECT * FROM graduacao.aluno ")
+                    .append("WHERE id_pessoa = '").append(pessoa.getId()).append("'");
+            Query query = entityManager.createNativeQuery(queryBuilder.toString(), Aluno.class);
+            lista = (ArrayList<Aluno>) query.getResultList();
+            transaction.commit();
+        }finally{
+            if(transaction.isActive()){
+                transaction.rollback();
+            }
+        }
+        return lista;
+    }
+
+    public void atualizaAlunos(Pessoa pessoa){
+        pessoa.setAlunos(getAlunosPorPessoa(pessoa));
+    }
+
     public void fechaEntidades(){
         entityManager.close();
         entityManagerFactory.close();
