@@ -47,7 +47,7 @@ public class PessoaServico {
             entityManager.persist(pessoa);
             transaction.commit();
             sucesso = true;
-        }finally {
+        }finally{
             if (transaction.isActive()){
                 transaction.rollback();
                 sucesso = false;
@@ -56,7 +56,7 @@ public class PessoaServico {
         return sucesso;
     }
 
-    public boolean alteraPessoa(Pessoa pessoa){
+    public boolean altera(Pessoa pessoa){
         boolean sucesso;
         try{
             transaction.begin();
@@ -104,7 +104,7 @@ public class PessoaServico {
         }
         return lista;
     }
-    
+
     public void fechaEntidades(){
         entityManager.close();
         entityManagerFactory.close();

@@ -59,7 +59,6 @@ public class Main {
                         switch (op2) {
                             case 1: // Inserir pessoa
                                 System.out.print("Digite o CPF: ");
-                                scan.nextLine();
                                 cpf = scan.nextLine();
 
                                 // Verifica a existência da pessoa antes de continuar
@@ -228,6 +227,7 @@ public class Main {
 
                                         Aluno novoA = new Aluno(pessoa, matricula, anoEntrada);
                                         if(alunoServico.inserir(novoA)) {
+                                            alunoServico.atualizaAlunos(pessoa);
                                             System.out.println("\nInserção realizada com sucesso!");
                                         }else{
                                             System.out.println("\nErro inesperado ao inserir aluno!");
@@ -268,9 +268,13 @@ public class Main {
                                             // Verifica se o CPF é valido
                                             pessoa = pessoaServico.buscaPorCPF(cpf);
                                             if(pessoa != null){
+
+                                                Pessoa pessoaAntiga = aluno.getPessoa();
                                                 aluno.setPessoa(pessoa);
 
                                                 if(alunoServico.altera(aluno)){
+                                                    alunoServico.atualizaAlunos(pessoaAntiga);
+                                                    alunoServico.atualizaAlunos(pessoa);
                                                     System.out.println("\nPessoa vinculada alterada com sucesso!");
                                                 }else{
                                                     System.out.println("\nErro inesperado ao alterar a pessoa vinculada a este aluno!");
@@ -290,6 +294,7 @@ public class Main {
                                                 aluno.setMatricula(matricula);
 
                                                 if(alunoServico.altera(aluno)) {
+                                                    alunoServico.atualizaAlunos(aluno.getPessoa());
                                                     System.out.println("\nMatrícula alterada com sucesso!");
                                                 }else{
                                                     System.out.println("\nErro inesperado ao alterar matrícula");
@@ -307,6 +312,7 @@ public class Main {
                                             aluno.setAnoEntrada(anoEntrada);
 
                                             if(alunoServico.altera(aluno)){
+                                                alunoServico.atualizaAlunos(aluno.getPessoa());
                                                 System.out.println("\nAno de entrada alterado com sucesso!");
                                             }else{
                                                 System.out.println("\nErro inesperado ao alterar o ano de entrada!");
@@ -336,6 +342,7 @@ public class Main {
 
                                     if(op3 == 1){
                                         if(alunoServico.remover(aluno)){
+                                            alunoServico.atualizaAlunos(aluno.getPessoa());
                                             System.out.println("\nAluno removido com sucesso!");
                                         }else{
                                             System.out.println("\nErro inesperado ao remover aluno!");
@@ -375,7 +382,7 @@ public class Main {
                     System.out.println("\nPROGRAMA ENCERRADO!");
                     break;
                 default:
-                    System.out.println("Digite uma opção válida!");
+                    System.out.println("\nDigite uma opção válida!\n");
                     break;
             }
         }while (op1 != 3);
